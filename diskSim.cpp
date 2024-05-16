@@ -6,6 +6,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include "diskSim.h"
 
 using namespace std;
 
@@ -15,7 +16,7 @@ public:
     int initialPosition;
     vector<int> track_requests;
 
-    Disk(int initialPosition) : initialPosition(initialPosition) {}
+    Disk(int track) : initialPosition(track) {}
 
     void addRequest(int request) {
         track_requests.push_back(request);
