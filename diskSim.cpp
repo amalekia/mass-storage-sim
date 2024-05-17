@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include "diskSim.h"
 
+#define MAX_TRACKS 4000
 using namespace std;
 
 // Define the Disk class
@@ -41,7 +42,7 @@ int SSTF(const Disk& disk, const vector<int>& tracks) {
     vector<int> remainingTracks = tracks;
     vector<int> sortedTracks;
     while (!remainingTracks.empty()) {
-        int minDistance = 5000;
+        int minDistance = MAX_TRACKS;
         int minIndex = -1;
         for (size_t i = 0; i < remainingTracks.size(); i++) {
             int distance = abs(currentPosition - remainingTracks[i]);
@@ -67,18 +68,18 @@ int SCAN(const Disk& disk, const vector<int>& tracks, const char* direction) {
 
     if (strcmp(direction, "positive") == 0) {
         if (remainingTracks[0] > disk.initialPosition) {
-            totalDistance += (remainingTracks[remainingTracks.size()-1] - disk.initialPosition);
+            totalDistance = (remainingTracks[remainingTracks.size()-1] - disk.initialPosition);
         }
         else {
-            totalDistance += (5000 - disk.initialPosition) + (5000 - remainingTracks[0]);
+            totalDistance = (MAX_TRACKS - disk.initialPosition) + (MAX_TRACKS - remainingTracks[0]);
         }
     }
     else {
         if (remainingTracks[remainingTracks.size()-1] < disk.initialPosition) {
-            totalDistance += (disk.initialPosition - remainingTracks[0]);
+            totalDistance = (disk.initialPosition - remainingTracks[0]);
         }
         else {
-            totalDistance += (disk.initialPosition) + (remainingTracks[remainingTracks.size() - 1]);
+            totalDistance = (disk.initialPosition) + (remainingTracks[remainingTracks.size() - 1]);
         }
     }
     return totalDistance;
@@ -92,21 +93,27 @@ int CSCAN(const Disk& disk, const vector<int>& tracks, const char* direction) {
     sort(remainingTracks.begin(), remainingTracks.end());
 
     int initialIdx = find(remainingTracks.begin(), remainingTracks.end(), disk.initialPosition) - remainingTracks.begin();
+    for (const auto& track :remainingTracks) {
+        if (track >= disk.initialPosition) {
+            initialIdx = find(remainingTracks.begin(), remainingTracks.end(), track) - remainingTracks.begin();
+            break;
+        }
+    }
 
     if (strcmp(direction, "positive") == 0) {
         if (remainingTracks[0] > disk.initialPosition) {
-            totalDistance += (remainingTracks[remainingTracks.size()-1] - disk.initialPosition);
+            totalDistance = (remainingTracks[remainingTracks.size()-1] - disk.initialPosition);
         }
         else {
-            totalDistance += (5000 - disk.initialPosition) + 5000 + remainingTracks[initialIdx-1];
+            totalDistance = (MAX_TRACKS - disk.initialPosition) + MAX_TRACKS + remainingTracks[initialIdx-1];
         }
     }
     else {
         if (remainingTracks[remainingTracks.size()-1] < disk.initialPosition) {
-            totalDistance += (disk.initialPosition - remainingTracks[0]);
+            totalDistance = (disk.initialPosition - remainingTracks[0]);
         }
         else {
-            totalDistance += (disk.initialPosition) + 5000 + remainingTracks[initialIdx + 1];
+            totalDistance = (disk.initialPosition) + MAX_TRACKS + remainingTracks[initialIdx];
         }
     }
     return totalDistance;
@@ -147,26 +154,31 @@ int CLOOK(const Disk& disk, const vector<int>& tracks, const char* direction) {
     vector<int> remainingTracks = tracks;
     sort(remainingTracks.begin(), remainingTracks.end());
 
-int initialIdx = find(remainingTracks.begin(), remainingTracks.end(), disk.initialPosition) - remainingTracks.begin();
+    int initialIdx = find(remainingTracks.begin(), remainingTracks.end(), disk.initialPosition) - remainingTracks.begin();
+    for (const auto& track :remainingTracks) {
+        if (track >= disk.initialPosition) {
+            initialIdx = find(remainingTracks.begin(), remainingTracks.end(), track) - remainingTracks.begin();
+            break;
+        }
+    }
 
     if (strcmp(direction, "positive") == 0) {
         if (remainingTracks[0] > disk.initialPosition) {
             totalDistance += (remainingTracks[remainingTracks.size()-1] - disk.initialPosition);
         }
         else {
-            totalDistance += (remainingTracks[remainingTracks.size()-1] - disk.initialPosition)
+            totalDistance = (remainingTracks[remainingTracks.size()-1] - disk.initialPosition) 
                                 + (remainingTracks[remainingTracks.size()-1] - remainingTracks[0])
                                 + (remainingTracks[initialIdx-1] - remainingTracks[0]);
         }
     }
     else {
         if (remainingTracks[remainingTracks.size()-1] < disk.initialPosition) {
-            totalDistance += (disk.initialPosition - remainingTracks[0]);
+            totalDistance = (disk.initialPosition - remainingTracks[0]);
         }
         else {
-            totalDistance += (disk.initialPosition - remainingTracks[0])
-                                + (remainingTracks[remainingTracks.size() - 1] - remainingTracks[0])
-                                + (remainingTracks[remainingTracks.size()- 1] - remainingTracks[initialIdx+1]);
+            totalDistance = (disk.initialPosition - remainingTracks[0]) 
+                                + (remainingTracks[remainingTracks.size() - 1] - remainingTracks[0]);
         }
     }
     return totalDistance;
